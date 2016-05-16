@@ -61,10 +61,15 @@ compliments.updateCompliment = function () {
 
 compliments.init = function () {
 
-	this.updateCompliment();
+	//this.updateCompliment();
+	this.do_standalone();
 
 	this.intervalId = setInterval(function () {
 		this.updateCompliment();
 	}.bind(this), this.updateInterval)
 
+}
+
+compliments.do_standalone = function () {
+	this.updateCompliment();	
 }

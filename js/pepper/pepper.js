@@ -3,19 +3,22 @@
 // The original version can be found here: http://airshp.com/2011/jquery-plugin-feed-to-json/
 var pepper = {
 	feed: config.pepper.feed || null,
+	feeds: config.pepper.feeds || null,
 	newsLocation: '.pepper',
 	syncLocation: '.lastsync',
 	newsItems: [],
 	seenNewsItem: [],
+	currentFeed: null,
 	_yqURL: 'https://query.yahooapis.com/v1/public/yql',
 	_yqlQS: '?format=json&q=select%20*%20from%20rss%20where%20url%3D',
 	_cacheBuster: Math.floor((new Date().getTime()) / 1200 / 1000),
 	_failedAttempts: 0,
-	fetchInterval: config.news.fetchInterval || 60000,
+	fetchInterval: config.pepper.fetchInterval || 60000,
 	updateInterval: config.pepper.interval || 5500,
 	fadeInterval: 0,
 	intervalId: null,
-	fetchNewsIntervalId: null
+	fetchNewsIntervalId: null,
+	counter: 0,
 }
 
 /**
@@ -43,7 +46,15 @@ pepper.fetchNews = function () {
 		this.fetchFeed(_yqUrlString);
 
 	}.bind(this));
+}
 
+pepper.fetchAndShowSingleFeed = function (feed){
+	this.currentFeed = feed;
+	// Reset the news feed
+	this.newsItems = [];
+
+	var _yqUrlString = this.buildQueryString(feed);
+	this.fetchFeed(_yqUrlString);
 }
 
 /**
@@ -89,7 +100,7 @@ pepper.parseFeed = function (data) {
 	}
 
 	this.newsItems = this.newsItems.concat(_rssItems);
-
+    this.showNews();
 	return true;
 
 }
@@ -121,7 +132,7 @@ pepper.showNews = function () {
 
 	text = this.newsItems.join("<br />");
 	$(this.newsLocation).updateWithText(text, this.fadeInterval);
-
+/*
 	var currTime = new Date();
 	hour = currTime.getHours();
 	if(hour < 10){
@@ -137,8 +148,9 @@ pepper.showNews = function () {
 	}
 
 	var syncDate = hour + ":" + min + ":" + sec;
-
-	$(this.syncLocation).updateWithText( syncDate, 0);
+*/
+	$(this.syncLocation).updateWithText( "<hr />" + this.currentFeed , 0);
+	this.counter = this.counter + 1;
 
 	return true;
 
@@ -146,15 +158,17 @@ pepper.showNews = function () {
 
 pepper.init = function () {
 
+	//this.do_standalone();
 	if (this.feed === null || (this.feed instanceof Array === false && typeof this.feed !== 'string')) {
 		return false;
 	} else if (typeof this.feed === 'string') {
 		this.feed = [this.feed];
 	}
 
-	this.fetchNews();
-	this.showNews();
-
+	//this.fetchNews();
+	//this.showNews();
+	
+/*
 	this.fetchNewsIntervalId = setInterval(function () {
 		this.fetchNews()
 	}.bind(this), this.fetchInterval)
@@ -162,5 +176,24 @@ pepper.init = function () {
 	this.intervalId = setInterval(function () {
 		this.showNews();
 	}.bind(this), this.updateInterval);
+*/
+	//var fetchIndex = 1;
+	
 
+	//this.fetchSingleNews(this.feeds[fetchIndex]);
+	//this.showNews();
+	var fetchIndex = 0;
+	setInterval(function(){		
+		this.fetchAndShowSingleFeed(this.feeds[fetchIndex]);
+		if(fetchIndex === this.feeds.length-1){
+			fetchIndex = 0;			
+		}else{
+			fetchIndex = fetchIndex + 1;
+		}
+	}.bind(this), this.fetchInterval);
+/*
+	this.intervalId = setInterval(function () {
+		this.showNews();
+	}.bind(this), this.updateInterval);
+	*/
 }

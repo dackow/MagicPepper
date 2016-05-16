@@ -25,14 +25,14 @@ var config = {
             'How was your sleep?'
         ],
         afternoon: [
-            'Hello, beauty!',
-            'You look sexy!',
+            'Hello, motherfucker!',
+            'You look good!',
             'Looking good today!'
         ],
         evening: [
             'Wow, you look hot!',
             'You look nice!',
-            'Hi, sexy!'
+            'Hi!'
         ]
     },
     calendar: {
@@ -68,7 +68,14 @@ var config = {
     },
     pepper: {
         feed: 'https://www.pepper.pl/rss/wszystkie',
-        updateInterval: 3000,//1000*60,
-    }
+        updateInterval: 1000,//1000*60,
+        fetchInterval: 15000,
+        feeds : ['http://wiadomosci.wp.pl/ver,rss,rss.xml', 
+                 'http://www.tvn24.pl/najnowsze.xml',
+                 'https://www.pepper.pl/rss/wszystkie']
+
+    },
+
+
 
 }
