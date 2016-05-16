@@ -19,6 +19,7 @@ var pepper = {
 	intervalId: null,
 	fetchNewsIntervalId: null,
 	counter: 0,
+	maxLineLength: 125,
 }
 
 /**
@@ -95,7 +96,16 @@ pepper.parseFeed = function (data) {
 
 	for (var i = 0, count = data.length; i < count; i++) {
 
-		_rssItems.push(data[i].title);
+		if(data[i].title.length > this.maxLineLength){
+			var sub = data[i].title.substring(0,this.maxLineLength);
+            var lastSpaceIndex = sub.lastIndexOf(" ");
+            if(lastSpaceIndex !== -1){
+            	sub = sub.substring(0, lastSpaceIndex) + "...";
+            }
+			_rssItems.push(sub);
+		}else{	
+			_rssItems.push(data[i].title);
+		}	
 
 	}
 
