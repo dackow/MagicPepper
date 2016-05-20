@@ -70,11 +70,17 @@ var config = {
         feed: 'https://www.pepper.pl/rss/wszystkie',
         updateInterval: 1000,//1000*60,
         fetchInterval: 15000,
-        feeds : ['http://wiadomosci.wp.pl/ver,rss,rss.xml', 
+        feeds : ['http://helion.pl/rss/promocje.rss',
+                 'http://wiadomosci.wp.pl/ver,rss,rss.xml', 
                  'http://www.tvn24.pl/najnowsze.xml',
                  'https://www.pepper.pl/rss/wszystkie']
 
     },
+    gmail: {
+        clientId: '844270599909-1djvmj97dmkb0tc25oo2irjnl6fgb51d.apps.googleusercontent.com',
+        apiKey: 'AIzaSyBpyjP1WisVP8wKhebgVhck2ShIaNv-k94',
+        scopes: 'https://www.googleapis.com/auth/gmail.readonly',
+    }
 
 
 

@@ -24,6 +24,8 @@ function roundVal(temp)
 	return Math.round(temp * 10) / 10;
 }
 
+
+
 jQuery(document).ready(function($) {
 
 	var eventList = [];
@@ -44,6 +46,9 @@ jQuery(document).ready(function($) {
 
 	weather.init();
 
+	gmail.init();
+
+	//$('head').append($('<script>').attr('type', 'text/javascript').attr('src', 'https://apis.google.com/js/client.js?onload=gmail.handleClientLoad'));
 	//news.init();
 
 	
