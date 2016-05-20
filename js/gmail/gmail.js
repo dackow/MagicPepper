@@ -6,7 +6,7 @@ var gmail = {
     apiKey: config.gmail.apiKey || null,
     scopes: config.gmail.scopes || null,
     gmailLocaltion: '.gmail',
-    newsItems: [],
+    newsItems:  new Array(),
     seenNewsItem: [],
     currentEmail: null,
     _failedAttempts: 0,
@@ -20,11 +20,12 @@ var gmail = {
 
 
 gmail.handleClientLoad = function(parent) {
+	/*
     gapi.client.setApiKey(this.apiKey);
 
     window.setTimeout(function() {
         parent.checkAuth(parent)
-    }, 1);
+    }, 1);*/
 }
 
 gmail.checkAuth = function(parent) {
@@ -59,6 +60,7 @@ gmail.handleAuthResult = function(authResult) {
     if (authResult && !authResult.error) {
         this.loadGmailApi();
         $('#authorize-button').remove();
+
         $('.table-inbox').removeClass("hidden");
     } else {
         $('#authorize-button').removeClass("hidden");
@@ -82,32 +84,43 @@ gmail.displayInbox = function() {
         'labelIds': 'INBOX',
         'maxResults': 10
     });
-    request.execute(function(response) {
+
+    var parent = this;
+    gmail.newsItems = new Array();
+	request.execute(function(response) {
         $.each(response.messages, function() {
             var messageRequest = gapi.client.gmail.users.messages.get({
                 'userId': 'me',
                 'id': this.id
             });
-            messageRequest.execute(this.appendMessageRow);
+            //messageRequest.execute(parent.gmail.appendMessageRow);
+            messageRequest.execute(function(message){
+            	gmail.newsItems.push(parent.gmail.getHeader(message.payload.headers, 'Subject'));
+            	var v = 1;
+            });
         });
     });
+
 }
 
+
 gmail.appendMessageRow = function(message) {
-    var from = this.getHeader(message.payload.headers, 'From');
-    var subject = this.getHeader(message.payload.headers, 'Subject');
-    var date = this.getHeader(message.payload.headers, 'Date');
-    /*
+    var from = this.gmail.getHeader(message.payload.headers, 'From');
+    var subject = this.gmail.getHeader(message.payload.headers, 'Subject');
+    var date = this.gmail.getHeader(message.payload.headers, 'Date');
+
+/*
+    
         $('.table-inbox tbody').append(
           '<tr>\
-            <td>'+this.getHeader(message.payload.headers, 'From')+'</td>\
+            <td>'+this.gmail.getHeader(message.payload.headers, 'From')+'</td>\
             <td>\
               <a href="#message-modal-' + message.id +
                 '" data-toggle="modal" id="message-link-' + message.id+'">' +
-                this.getHeader(message.payload.headers, 'Subject') +
+                this.gmail.getHeader(message.payload.headers, 'Subject') +
               '</a>\
             </td>\
-            <td>'+this.getHeader(message.payload.headers, 'Date')+'</td>\
+            <td>'+this.gmail.getHeader(message.payload.headers, 'Date')+'</td>\
           </tr>'
         );
         $('body').append(
@@ -122,7 +135,7 @@ gmail.appendMessageRow = function(message) {
                           aria-label="Close">\
                     <span aria-hidden="true">&times;</span></button>\
                   <h4 class="modal-title" id="myModalLabel">' +
-                    this.getHeader(message.payload.headers, 'Subject') +
+                    this.gmail.getHeader(message.payload.headers, 'Subject') +
                   '</h4>\
                 </div>\
                 <div class="modal-body">\
@@ -176,6 +189,18 @@ gmail.getHTMLPart = function(arr) {
 gmail.init = function() {
     var parent = this;
     this.handleClientLoad(parent);
+
+	this.fetchEmails();
+    this.showEmails();
+
+    this.fetchNewsIntervalId = setInterval(function () {
+		this.fetchEmails()
+	}.bind(this), this.fetchInterval)
+
+	this.intervalId = setInterval(function () {
+		this.showEmails();
+	}.bind(this), this.updateInterval);
+
     //jQuery.getScript( "https://apis.google.com/js/client.js", this.handleClientLoad);
     //$('head').append($('<script>').attr('type', 'text/javascript').attr('src', 'https://apis.google.com/js/client.js'));
     //jQuery.getScript( "https://apis.google.com/js/api.js", this.handleClientLoad );	
@@ -185,15 +210,17 @@ gmail.init = function() {
     //$(this.gmailLocaltion).updateWithText( '<script src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>', 0);
 }
 
+gmail.fetchEmails = function(){
+  gapi.client.setApiKey(this.apiKey);
 
-gmail.includeJS = function(jsFile) {
-    //$('head').append($('<script>').attr('type', 'text/javascript').attr('src', 'https://apis.google.com/js/client.js'));
-
+    window.setTimeout(function() {
+        gmail.checkAuth(gmail)
+    }, 1);//	this.displayInbox();
 }
 
-
 gmail.showEmails = function() {
-        //$(this.gmailLocaltion).updateWithText( "<hr />" + this.currentEmail , 0);
+	var html = '<div class="container"><table class="table table-striped table-inbox hidden"><thead><tr><th>From</th><th>Subject</th><th>Date/Time</th></tr></thead><tbody></tbody></table></div>';
+        $(this.gmailLocaltion).updateWithText( html , 0);
     }
     /*
     /**
